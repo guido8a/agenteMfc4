@@ -1,4 +1,4 @@
-package com.ejemplo
+package agente
 
 import grails.testing.web.controllers.ControllerUnitTest
 import spock.lang.Specification

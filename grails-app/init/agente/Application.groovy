@@ -1,4 +1,4 @@
-package sele12
+package agente
 
 import grails.boot.GrailsApp
 import grails.boot.config.GrailsAutoConfiguration
