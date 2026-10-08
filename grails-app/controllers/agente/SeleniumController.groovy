@@ -1,16 +1,5 @@
 package agente
 
-//class SeleniumController {
-//
-//    // Grails inyecta automáticamente tu servicio por el nombre de la variable
-//    SeleniumService seleniumService
-//
-//    def index() {
-//        String resultado = seleniumService.ejecutarFirefox()
-//        render "Automatización completada con éxito. Título de la página: ${resultado}"
-//    }
-//}
-
 class SeleniumController {
 
     SeleniumService seleniumService
@@ -21,18 +10,18 @@ class SeleniumController {
     }
 
     // Procesa la acción del formulario
-    def ejecutar() {
-        String urlInput = params.urlDestino
-
-        // Ejecuta el servicio pasando la URL del formulario
-        String resultado = seleniumService.ejecutarFirefox(urlInput)
-
-        // Guarda el resultado temporalmente para mostrarlo en la vista
-        flash.message = "Título de la página capturado: '${resultado}' para la URL [${urlInput}]"
-
-        // Redirige de vuelta al panel visual
-        redirect(action: "index", params: [urlDestino: urlInput])
-    }
+//    def ejecutar() {
+//        String urlInput = params.urlDestino
+//
+//        // Ejecuta el servicio pasando la URL del formulario
+//        String resultado = seleniumService.ejecutarFirefox(urlInput)
+//
+//        // Guarda el resultado temporalmente para mostrarlo en la vista
+//        flash.message = "Título de la página capturado: '${resultado}' para la URL [${urlInput}]"
+//
+//        // Redirige de vuelta al panel visual
+//        redirect(action: "index", params: [urlDestino: urlInput])
+//    }
 
     def iniciar() {
         println "=== Petición web recibida: Iniciando Selenium ==="
