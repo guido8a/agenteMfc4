@@ -70,7 +70,7 @@ dependencies {
     // Incluye Selenium Manager integrado (desde 4.6), que descarga y configura
     // automáticamente el driver de Edge (msedgedriver) sin necesidad de
     // WebDriverManager ni de System.setProperty().
-    compile 'org.seleniumhq.selenium:selenium-java:4.10.0'
+    compile 'org.seleniumhq.selenium:selenium-java:4.13.0'
 
     testCompile("org.grails.plugins:geb") {
         exclude group: 'org.seleniumhq.selenium'

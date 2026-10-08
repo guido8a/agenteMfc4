@@ -16,14 +16,76 @@ import java.time.Duration
 
 class SeleniumService {
 
+    // Bandera estática: garantiza que el driver se extraiga UNA sola vez por JVM
+    private static volatile File driverExtraido = null
+    private static final Object driverLock = new Object()
 
-    /**
-     * Crea un WebDriver de Edge con Selenium Manager.
-     * Selenium Manager detecta la versión de Edge instalada,
-     * descarga el msedgedriver correspondiente y lo configura solo.
-     * NO se requiere System.setProperty ni extraer drivers del WAR.
-     */
+    private File obtenerDriverExtraido() {
 
+        if (driverExtraido != null && driverExtraido.exists()) {
+            return driverExtraido
+        }
+
+        synchronized (driverLock) {
+            // Doble verificación dentro del lock
+            if (driverExtraido != null && driverExtraido.exists()) {
+                return driverExtraido
+            }
+
+            boolean isWindows = System.getProperty("os.name").toLowerCase().contains("win")
+            String driverName = isWindows ? "msedgedriver.exe" : "msedgedriver"
+
+            String tempDir = System.getProperty("java.io.tmpdir")
+            File targetFile = new File(tempDir, driverName)
+
+            // Extraer desde el WAR (classpath) sobrescribiendo el archivo temporal
+            InputStream inputStream = this.class.classLoader
+                    .getResourceAsStream("drivers/" + driverName)
+
+            if (inputStream == null) {
+                throw new FileNotFoundException(
+                        "No se encontró el driver dentro del WAR en: resources/drivers/" + driverName)
+            }
+
+            // Escribir directamente (withOutputStream sobrescribe el contenido)
+            targetFile.withOutputStream { outputStream ->
+                outputStream << inputStream
+            }
+
+            if (!isWindows) {
+                targetFile.setExecutable(true)
+            }
+
+            println "Driver extraído en: ${targetFile.absolutePath} (${targetFile.length()} bytes)"
+            driverExtraido = targetFile
+            return targetFile
+        }
+    }
+
+    private WebDriver crearDriver() {
+        File driverFile = obtenerDriverExtraido()
+
+        // FORZAR el uso del driver local y desactivar Selenium Manager
+        System.setProperty("webdriver.edge.driver", driverFile.getAbsolutePath())
+
+        EdgeOptions options = new EdgeOptions()
+        options.addArguments(
+                "--disable-gpu",
+                "--no-sandbox",
+                "--disable-dev-shm-usage",
+                "--start-maximized",
+                "--window-size=1920,1080",
+                "--remote-allow-origins=*",
+                "--user-data-dir=" + System.getProperty("java.io.tmpdir") + "/edge-profile-" + UUID.randomUUID()
+        )
+
+        // Crear el Service apuntando explícitamente al driver
+        EdgeDriverService service = new EdgeDriverService.Builder()
+                .usingDriverExecutable(driverFile)
+                .build()
+
+        return new EdgeDriver(service, options)
+    }
 
     private WebDriver crearDriver_old() {
         boolean isWindows = System.getProperty("os.name").toLowerCase().contains("win")
@@ -73,7 +135,7 @@ class SeleniumService {
         return new EdgeDriver(service, options)
     }
 
-    private WebDriver crearDriver() {
+    private WebDriver crearDriver_bk() {
         boolean isWindows = System.getProperty("os.name").toLowerCase().contains("win")
         String driverName = isWindows ? "msedgedriver.exe" : "msedgedriver"
 
