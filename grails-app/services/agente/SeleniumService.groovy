@@ -87,53 +87,6 @@ class SeleniumService {
         return new EdgeDriver(service, options)
     }
 
-    private WebDriver crearDriver_old() {
-        boolean isWindows = System.getProperty("os.name").toLowerCase().contains("win")
-        String driverName = isWindows ? "msedgedriver.exe" : "msedgedriver"
-
-        String tempDir = System.getProperty("java.io.tmpdir")
-        java.io.File targetFile = new java.io.File(tempDir, driverName)
-
-        // SIEMPRE extraer y sobrescribir el driver desde el WAR
-        java.io.InputStream inputStream = this.class.classLoader
-                .getResourceAsStream("drivers/" + driverName)
-
-        if (inputStream == null) {
-            throw new java.io.FileNotFoundException(
-                    "No se encontró el driver dentro del WAR en: resources/drivers/" + driverName)
-        }
-
-        // Borrar el archivo temporal anterior si existe
-        if (targetFile.exists()) {
-            targetFile.delete()
-        }
-
-        targetFile.withOutputStream { outputStream ->
-            outputStream << inputStream
-        }
-
-        if (!isWindows) {
-            targetFile.setExecutable(true)
-        }
-
-        println "Usando driver en: ${targetFile.absolutePath}"
-
-        EdgeOptions options = new EdgeOptions()
-        options.addArguments(
-                "--disable-gpu",
-                "--no-sandbox",
-                "--disable-dev-shm-usage",
-                "--start-maximized",
-                "--window-size=1920,1080",
-//                "--remote-allow-origins=*"
-        )
-
-        EdgeDriverService service = new EdgeDriverService.Builder()
-                .usingDriverExecutable(targetFile)
-                .build()
-
-        return new EdgeDriver(service, options)
-    }
 
     private WebDriver crearDriver_bk() {
         boolean isWindows = System.getProperty("os.name").toLowerCase().contains("win")
